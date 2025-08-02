@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Poll Creator</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #ede7f6, #e0f2f1);
+      margin: 0;
+      padding: 40px;
+      color: #333;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      background-color: #4a148c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-button:hover {
+      background-color: #7b1fa2;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #4a148c;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      background-color: #6200ea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #3700b3;
+    }
+
+    h2 {
+      margin-top: 40px;
+      color: #333;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f3e5f5;
+      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .temp-section li {
+      background: #fff9c4;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="menu.html" class="back-button">← Back to Menu</a>
+
+  <div class="container">
+    <h1>Create a Poll</h1>
+
+    <input id="poll-question" placeholder="Enter your question" />
+    <input id="option-a" placeholder="Option A" />
+    <input id="option-b" placeholder="Option B" />
+
+    <div class="btn-group">
+      <button onclick="createPermanentPoll()">Permanent Poll</button>
+      <button onclick="createTemporaryPoll()">Temporary Poll</button>
+    </div>
+
+    <h2>🟢 Live Polls (Permanent)</h2>
+    <ul id="poll-list"></ul>
+
+    <h2>🟡 Temporary Polls</h2>
+    <ul id="temp-poll-list" class="temp-section"></ul>
+  </div>
+
+  <script type="module">
+    import {
+      initializeApp as initMainApp
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      push,
+      onValue,
+      remove
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+    import {
+      initializeApp as initTempApp
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import {
+      getDatabase as getTempDatabase,
+      ref as tempRef,
+      push as tempPush,
+      onValue as onTempValue,
+      remove as tempRemove
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+    const mainConfig = {
+      apiKey: "AIzaSyB1rsOoQjBS1qhwhUNZSfMlRkS2hgJQTMQ",
+      authDomain: "useless---p2.firebaseapp.com",
+      projectId: "useless---p2",
+      storageBucket: "useless---p2.firebasestorage.app",
+      messagingSenderId: "387646944392",
+      appId: "1:387646944392:web:b87cd889fc93d8139bdb3d"
+    };
+
+    const mainApp = initMainApp(mainConfig);
+    const db = getDatabase(mainApp);
+
+    const tempConfig = {
+      apiKey: "AIzaSyAuHVchSq-TBixstI1nFtcsom5xVpailKI",
+      authDomain: "useless2-0000.firebaseapp.com",
+      databaseURL: "https://useless2-0000-default-rtdb.firebaseio.com",
+      projectId: "useless2-0000",
+      storageBucket: "useless2-0000.firebasestorage.app",
+      messagingSenderId: "812291299196",
+      appId: "1:812291299196:web:7cca155ae4b6ed4c0c36f9",
+      measurementId: "G-MYBY2D2CM2"
+    };
+
+    const tempApp = initTempApp(tempConfig, "tempApp");
+    const tempDB = getTempDatabase(tempApp);
+
+    const questionEl = document.getElementById("poll-question");
+    const optionAEl = document.getElementById("option-a");
+    const optionBEl = document.getElementById("option-b");
+
+    window.createPermanentPoll = async () => {
+      const question = questionEl.value.trim();
+      const optionA = optionAEl.value.trim();
+      const optionB = optionBEl.value.trim();
+
+      if (!question || !optionA || !optionB) {
+        alert("❌ Please fill in all fields.");
+        return;
+      }
+
+      const pollRef = ref(db, "polls");
+      await push(pollRef, {
+        question,
+        options: {
+          A: { text: optionA, votes: 0 },
+          B: { text: optionB, votes: 0 }
+        },
+        createdAt: Date.now()
+      });
+
+      alert("✅ Permanent poll created!");
+      questionEl.value = optionAEl.value = optionBEl.value = "";
+    };
+
+    window.createTemporaryPoll = async () => {
+      const question = questionEl.value.trim();
+      const optionA = optionAEl.value.trim();
+      const optionB = optionBEl.value.trim();
+
+      if (!question || !optionA || !optionB) {
+        alert("❌ Please fill in all fields.");
+        return;
+      }
+
+      const pollRef = tempRef(tempDB, "temp_polls");
+      await tempPush(pollRef, {
+        question,
+        options: {
+          A: { text: optionA, votes: 0 },
+          B: { text: optionB, votes: 0 }
+        },
+        createdAt: Date.now()
+      });
+
+      alert("🟡 Temporary poll created!");
+      questionEl.value = optionAEl.value = optionBEl.value = "";
+    };
+
+    window.deletePoll = async (key, isTemporary) => {
+      const refPath = isTemporary
+        ? tempRef(tempDB, `temp_polls/${key}`)
+        : ref(db, `polls/${key}`);
+      try {
+        await remove(refPath);
+        alert("🗑 Poll deleted");
+      } catch (e) {
+        console.error("Error deleting poll:", e);
+        alert("❌ Failed to delete poll.");
+      }
+    };
+
+    const livePollsRef = ref(db, "polls");
+    onValue(livePollsRef, (snapshot) => {
+      const pollList = document.getElementById("poll-list");
+      pollList.innerHTML = "";
+
+      snapshot.forEach((pollSnap) => {
+        const poll = pollSnap.val();
+        const key = pollSnap.key;
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${poll.question} — A: ${poll.options.A.text}, B: ${poll.options.B.text}
+          <button onclick="deletePoll('${key}', false)" style="margin-left: 10px; color: red;">🗑 Delete</button>
+        `;
+        pollList.appendChild(li);
+      });
+    });
+
+    const tempPollsRef = tempRef(tempDB, "temp_polls");
+    onTempValue(tempPollsRef, (snapshot) => {
+      const pollList = document.getElementById("temp-poll-list");
+      pollList.innerHTML = "";
+
+      snapshot.forEach((pollSnap) => {
+        const poll = pollSnap.val();
+        const key = pollSnap.key;
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${poll.question} — A: ${poll.options.A.text}, B: ${poll.options.B.text}
+          <button onclick="deletePoll('${key}', true)" style="margin-left: 10px; color: red;">🗑 Delete</button>
+        `;
+        pollList.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>

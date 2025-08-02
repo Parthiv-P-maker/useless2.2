@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vote on Polls</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e8f5e9;
+      margin: 0;
+      padding: 40px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    .poll {
+      margin-bottom: 30px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f1f8e9;
+    }
+
+    .question {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .option {
+      margin: 8px 0;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f5f5f5;
+      border: 1px solid #ccc;
+    }
+
+    .option:hover {
+      background: #dcedc8;
+    }
+
+    .bar {
+      height: 20px;
+      background: #a5d6a7;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+
+    .bar-container {
+      background: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      height: 20px;
+      margin-top: 5px;
+    }
+
+    button.back-btn {
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      background-color: #388e3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button.back-btn:hover {
+      background-color: #2e7d32;
+    }
+
+    h2 {
+      color: #388e3c;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="back-btn" onclick="location.href='menu.html'">← Back to Menu</button>
+    <h1>Vote on Polls</h1>
+
+    <h2>🟢 Permanent Polls</h2>
+    <div id="permanent-polls"></div>
+
+    <h2>🟡 Temporary Polls</h2>
+    <div id="temporary-polls"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      onValue,
+      update,
+      get,
+      child
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+    const permConfig = {
+      apiKey: "AIzaSyB1rsOoQjBS1qhwhUNZSfMlRkS2hgJQTMQ",
+      authDomain: "useless---p2.firebaseapp.com",
+      databaseURL: "https://useless---p2-default-rtdb.firebaseio.com",
+      projectId: "useless---p2",
+      storageBucket: "useless---p2.appspot.com",
+      messagingSenderId: "387646944392",
+      appId: "1:387646944392:web:b87cd889fc93d8139bdb3d"
+    };
+
+    const tempConfig = {
+      apiKey: "AIzaSyAuHVchSq-TBixstI1nFtcsom5xVpailKI",
+      authDomain: "useless2-0000.firebaseapp.com",
+      databaseURL: "https://useless2-0000-default-rtdb.firebaseio.com",
+      projectId: "useless2-0000",
+      storageBucket: "useless2-0000.appspot.com",
+      messagingSenderId: "812291299196",
+      appId: "1:812291299196:web:7cca155ae4b6ed4c0c36f9"
+    };
+
+    const permApp = initializeApp(permConfig);
+    const tempApp = initializeApp(tempConfig, "tempApp");
+
+    const permDB = getDatabase(permApp);
+    const tempDB = getDatabase(tempApp);
+    const auth = getAuth(permApp);
+
+    let currentUserId = null;
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        currentUserId = user.uid;
+        loadPolls("permanent", permDB, "permanent-polls");
+        loadPolls("temporary", tempDB, "temporary-polls");
+      } else {
+        alert("Please log in to vote.");
+        window.location.href = "index.html";
+      }
+    });
+
+    function loadPolls(type, db, containerId) {
+      const pollsRef = ref(db, type === "permanent" ? "polls" : "temp_polls");
+
+      onValue(pollsRef, snapshot => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+
+        snapshot.forEach(childSnap => {
+          const pollId = childSnap.key;
+          const poll = childSnap.val();
+          const userVoted = poll.voters?.[currentUserId];
+          const totalVotes = (poll.options.A.votes || 0) + (poll.options.B.votes || 0);
+
+          const pollDiv = document.createElement("div");
+          pollDiv.className = "poll";
+          pollDiv.innerHTML = `
+            <div class="question">${poll.question}</div>
+            <div class="option" onclick="vote('${type}', '${pollId}', 'A')" ${userVoted ? "style='pointer-events:none;opacity:0.6'" : ""}>
+              A: ${poll.options.A.text}
+              <div class="bar-container">
+                <div class="bar" style="width: ${totalVotes ? (poll.options.A.votes / totalVotes) * 100 : 0}%"></div>
+              </div>
+            </div>
+            <div class="option" onclick="vote('${type}', '${pollId}', 'B')" ${userVoted ? "style='pointer-events:none;opacity:0.6'" : ""}>
+              B: ${poll.options.B.text}
+              <div class="bar-container">
+                <div class="bar" style="width: ${totalVotes ? (poll.options.B.votes / totalVotes) * 100 : 0}%"></div>
+              </div>
+            </div>
+          `;
+          container.appendChild(pollDiv);
+        });
+      });
+    }
+
+    window.vote = async function(type, pollId, option) {
+      const db = type === "permanent" ? permDB : tempDB;
+      const pollRef = ref(db, type === "permanent" ? `polls/${pollId}` : `temp_polls/${pollId}`);
+
+      const pollSnap = await get(pollRef);
+      if (!pollSnap.exists()) return;
+
+      const poll = pollSnap.val();
+      if (poll.voters && poll.voters[currentUserId]) {
+        alert("❌ You have already voted on this poll.");
+        return;
+      }
+
+      const updates = {
+        [`options/${option}/votes`]: (poll.options[option].votes || 0) + 1,
+        [`voters/${currentUserId}`]: option
+      };
+
+      await update(pollRef, updates);
+    };
+  </script>
+</body>
+</html>

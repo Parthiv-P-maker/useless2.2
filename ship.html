@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ship Spinner 2.0</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 60px;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: #ffffffcc;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-button {
+      background-color: #4a148c;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .back-button:hover {
+      background-color: #7b1fa2;
+    }
+
+    .notif-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .notif-button {
+      font-size: 14px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      background-color: #eeeeee;
+      cursor: pointer;
+    }
+
+    #notif-count {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background-color: red;
+      color: white;
+      font-size: 12px;
+      border-radius: 50%;
+      padding: 2px 6px;
+      display: none;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #d81b60;
+      margin: 10px 0;
+    }
+
+    .controls {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    select, button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #d81b60;
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ad1457;
+    }
+
+    #wheel {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #ec407a;
+      margin-top: 30px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    #result {
+      font-size: 22px;
+      color: #6a1b9a;
+      margin-top: 30px;
+      max-width: 80%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR WITH BACK BUTTON + NOTIFICATION -->
+  <div class="top-bar">
+    <a href="menu.html" class="back-button">← Back to menu</a>
+
+    <div class="notif-wrapper">
+      <button id="notif-btn" class="notif-button">🔔 Notifications</button>
+      <span id="notif-count">0</span>
+    </div>
+  </div>
+
+  <!-- PAGE TITLE -->
+  <h1>✨ Spin to Ship ✨</h1>
+
+  <!-- SHIP CONTROLS -->
+  <div class="controls">
+    <label for="ship-type">Choose Ship Type:</label>
+    <select id="ship-type">
+      <option value="Romantic">💘 Romantic</option>
+      <option value="Friendship">🤝 Friendship</option>
+      <option value="Academic">📚 Academic</option>
+      <option value="Gaming">🎮 Gaming</option>
+      <option value="Creative">🎨 Creative</option>
+      <option value="Business">💼 Business</option>
+    </select>
+    <br>
+    <button onclick="spinWheel()">🚀 Spin Now</button>
+  </div>
+
+  <!-- WHEEL + RESULT -->
+  <canvas id="wheel" width="300" height="300"></canvas>
+  <div id="result"></div>
+
+  <!-- FIREBASE AND JS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1rsOoQjBS1qhwhUNZSfMlRkS2hgJQTMQ",
+      authDomain: "useless---p2.firebaseapp.com",
+      databaseURL: "https://useless---p2-default-rtdb.firebaseio.com",
+      projectId: "useless---p2",
+      storageBucket: "useless---p2.appspot.com",
+      messagingSenderId: "387646944392",
+      appId: "1:387646944392:web:b87cd889fc93d8139bdb3d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const resultDiv = document.getElementById("result");
+    const notifCountSpan = document.getElementById("notif-count");
+    const notifBtn = document.getElementById("notif-btn");
+
+    notifBtn.onclick = () => {
+      window.location.href = "notifi.html";
+    };
+
+    let usernames = [];
+    let userMap = {}; // username => user data
+    let currentUserData = null;
+
+    // Load all users
+    const userRef = ref(db, "users");
+    onValue(userRef, (snapshot) => {
+      usernames = [];
+      userMap = {};
+      snapshot.forEach(child => {
+        const user = child.val();
+        if (user.username) {
+          usernames.push(user.username);
+          userMap[user.username] = { ...user, id: child.key };
+        }
+      });
+      drawWheel();
+    });
+
+    // Track auth user
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const currentRef = ref(db, `users/${user.uid}`);
+        onValue(currentRef, (snap) => {
+          currentUserData = snap.val();
+        });
+
+        // Notification count
+        const notifRef = ref(db, `notifications/${user.uid}`);
+        onValue(notifRef, (snapshot) => {
+          const count = snapshot.size;
+          notifCountSpan.textContent = count;
+          notifCountSpan.style.display = count > 0 ? "inline-block" : "none";
+        });
+      }
+    });
+
+    function drawWheel() {
+      const center = canvas.width / 2;
+      const radius = center;
+      const angleStep = (2 * Math.PI) / usernames.length;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      usernames.forEach((name, i) => {
+        const angle = i * angleStep;
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, angle, angle + angleStep);
+        ctx.fillStyle = `hsl(${i * 360 / usernames.length}, 70%, 80%)`;
+        ctx.fill();
+        ctx.fillStyle = "#222";
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(angle + angleStep / 2);
+        ctx.textAlign = "right";
+        ctx.font = "14px Arial";
+        ctx.fillText(name, radius - 10, 5);
+        ctx.restore();
+      });
+    }
+
+    function spinWheel() {
+      if (usernames.length < 2 || !currentUserData) {
+        alert("❌ Not enough users or user not loaded.");
+        return;
+      }
+
+      const type = document.getElementById("ship-type").value;
+      const emojis = {
+        Romantic: "❤️", Friendship: "🤝", Academic: "📘",
+        Gaming: "🎮", Creative: "🎨", Business: "💼"
+      };
+
+      const shuffled = usernames.sort(() => 0.5 - Math.random());
+      const user1 = currentUserData.username;
+      let user2 = shuffled.find(name => name !== user1);
+
+      if (!user2) {
+        alert("❌ No other user available to ship.");
+        return;
+      }
+
+      let angle = 0;
+      const spins = 3;
+      const interval = setInterval(() => {
+        angle += 30;
+        if (angle >= spins * 360) {
+          clearInterval(interval);
+          resultDiv.innerHTML = `💫 You created a <b>${type}</b> ship between <b>${user1}</b> ${emojis[type]} <b>${user2}</b>!`;
+
+          // Send notification to user2
+          const user2Id = userMap[user2]?.id;
+          if (user2Id) {
+            const notifRef = ref(db, `notifications/${user2Id}`);
+            const newRef = push(notifRef);
+            set(newRef, {
+              type: "ship",
+              shipType: type,
+              fromUser: {
+                id: auth.currentUser.uid,
+                username: user1
+              },
+              toUser: {
+                id: user2Id,
+                username: user2
+              },
+              timestamp: Date.now()
+            });
+          }
+        }
+
+        ctx.save();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((angle * Math.PI) / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+        drawWheel();
+        ctx.restore();
+      }, 30);
+    }
+
+    window.spinWheel = spinWheel;
+  </script>
+</body>
+</html>

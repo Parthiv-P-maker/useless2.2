@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weekly Timetable</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e1bee7);
+      margin: 0;
+      padding: 40px;
+      color: #333;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      background-color: #4a148c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-button:hover {
+      background-color: #7b1fa2;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4a148c;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #6200ea;
+      color: white;
+    }
+
+    .day-col {
+      font-weight: bold;
+      background-color: #ede7f6;
+    }
+
+    .lunch-cell {
+      background-color: #ffe082;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .period-btn {
+      background-color: #7e57c2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .period-btn:hover {
+      background-color: #5e35b1;
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        font-size: 12px;
+      }
+
+      .period-btn {
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="menu.html" class="back-button">← Back to Menu</a>
+
+  <h1>Weekly Timetable</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Day</th>
+        <th>Period 1<br>(9:00–9:45)</th>
+        <th>Period 2<br>(9:50–10:35)</th>
+        <th>Period 3<br>(10:40–11:25)</th>
+        <th>Lunch<br>(11:25–11:50)</th>
+        <th>Period 4<br>(11:50–12:35)</th>
+        <th>Period 5<br>(12:40–1:25)</th>
+        <th>Period 6<br>(1:30–2:15)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="day-col">Monday</td>
+        <td><a class="period-btn" href="ap.html">ap</a></td>
+        <td><a class="period-btn" href="maths.html">maths</a></td>
+        <td><a class="period-btn" href="ds.html">ds</a></td>
+        <td class="lunch-cell">Lunch Break</td>
+        <td><a class="period-btn" href="ls.html">ls</a></td>
+        <td><a class="period-btn" href="ds/con lab.html">ds/con lab</a></td>
+        <td><a class="period-btn" href="ds/con lab">ds/con lab</a></td>
+      </tr>
+      <tr>
+        <td class="day-col">Tuesday</td>
+        <td><a class="period-btn" href="ds.html">ds</a></td>
+        <td><a class="period-btn" href="ems.html">ems</a></td>
+        <td><a class="period-btn" href="con.html">con</a></td>
+        <td class="lunch-cell">Lunch Break</td>
+        <td><a class="period-btn" href="maths.html">maths</a></td>
+        <td><a class="period-btn" href="probstat.html">probstat</a></td>
+        <td><a class="period-btn" href="ls.html">Music</a></td>
+      </tr>
+      <tr>
+        <td class="day-col">Wednesday</td>
+        <td><a class="period-btn" href="history.html">History</a></td>
+        <td><a class="period-btn" href="math.html">Math</a></td>
+        <td><a class="period-btn" href="science.html">Science</a></td>
+        <td class="lunch-cell">Lunch Break</td>
+        <td><a class="period-btn" href="english.html">English</a></td>
+        <td><a class="period-btn" href="physics.html">Physics</a></td>
+        <td><a class="period-btn" href="pe.html">PE</a></td>
+      </tr>
+      <tr>
+        <td class="day-col">Thursday</td>
+        <td><a class="period-btn" href="math.html">Math</a></td>
+        <td><a class="period-btn" href="geography.html">Geography</a></td>
+        <td><a class="period-btn" href="computer.html">Computer</a></td>
+        <td class="lunch-cell">Lunch Break</td>
+        <td><a class="period-btn" href="biology.html">Biology</a></td>
+        <td><a class="period-btn" href="english.html">English</a></td>
+        <td><a class="period-btn" href="drama.html">Drama</a></td>
+      </tr>
+      <tr>
+        <td class="day-col">Friday</td>
+        <td><a class="period-btn" href="math.html">Math</a></td>
+        <td><a class="period-btn" href="science.html">Science</a></td>
+        <td><a class="period-btn" href="art.html">Art</a></td>
+        <td class="lunch-cell">Lunch Break</td>
+        <td><a class="period-btn" href="music.html">Music</a></td>
+        <td><a class="period-btn" href="history.html">History</a></td>
+        <td><a class="period-btn" href="computer.html">Computer</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
+    
