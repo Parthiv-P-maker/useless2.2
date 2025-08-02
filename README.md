@@ -2,41 +2,36 @@
 
 
 # [Project Name] 🎯
-
+UNITFY
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: Prime SUSpects
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: Prime SUSpects - TKM collage of engineering, kollam
+- Member 1: Parthiv P - TKM collage of engineering, kollam
+- Member 2: Sivanandana J P - TKM collage of engineering, kollam
 
 ### Project Description
-[2-3 lines about what your project does]
+A zone where a group of people can come togather can engage in stuffs
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+lask of unity among the collag classmates
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+our platform provides ths platform to engage and intract with everyone
 
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
-
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
+- HTML
+- CSS
+- JAVASCRIPT
+- FIREBASE
 
 ### Implementation
-For Software:
+For Software: https://parthiv-p-maker.github.io/useless2.1/index.html
 # Installation
 [commands]
 
@@ -47,50 +42,19 @@ For Software:
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
-
-# Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Add caption explaining your workflow*
-
-For Hardware:
-
-# Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
-
-# Build Photos
-![Components](Add photo of your components here)
-*List out all components shown*
-
-![Build](Add photos of build process here)
-*Explain the build steps*
-
-![Final](Add photo of final product here)
-*Explain the final build*
+<img width="1920" height="1080" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/c46c6716-1519-4e0c-84fb-31128f31aeed" />
+<img width="1920" height="1080" alt="Screenshot (2)" src="https://github.com/user-attachments/assets/8e6bb05b-49e7-4bf2-a309-96f5d5f0716a" />
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/ea0cba73-8aac-4956-be83-d769f4c7868e" />
 
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
-
-# Additional Demos
-[Add any extra demo materials/links]
+https://drive.google.com/file/d/1E_NBN1qHy2odTe1ja16xixTmTHO6p8-I/view?usp=sharing
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
+- PARTHIV P : BACKEND
+- SIVANANDANA J P: FRONTEND
+
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
